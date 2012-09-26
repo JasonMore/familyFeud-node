@@ -47,14 +47,18 @@ var viewModel = function() {
 	var self = this;
 
 	//hub
-	self.hub = $.connection.gamesHub;
+	// self.hub = $.connection.gamesHub;
 
-	self.hub.reportError = function(error) {
+	self.hub = {}; // hack for now
+
+	var socket = io.connect();
+
+	socket.on('reportError', function(error) {
 		$("#error").text(error);
 		$("#error").fadeIn(1000, function() {
 			$("#error").fadeOut(3000);
 		});
-	};
+	});
 
     // mapping
     self.init = function () {
@@ -128,15 +132,11 @@ var viewModel = function() {
 	    //if (self.isAudience()) return;
 
 	    var dtoAnswer = ko.mapping.toJS(answer);
-	    self.hub.sendShowAnswer(dtoAnswer).done(function() {
-	    	console.log('Sent Answer!');
-	    }).fail(function(e) {
-	    	console.warn(e);
-	    });
+	    socket.emit('sendShowAnswer',dtoAnswer);
 	    ;
 	};
 
-	self.hub.gotShowAnswer = function(dtoAnswer) {
+	socket.on('gotShowAnswer', function(dtoAnswer) {
 		//find the answer in this model
 		var selectedAnswer = ko.utils.arrayFilter(self.currentAnswers(), function(answer) {
 			return answer.answerNumber() == dtoAnswer.answerNumber;
@@ -156,7 +156,7 @@ var viewModel = function() {
 			self.score(self.score() + selectedAnswer.points());
 		}
 
-	};
+	});
 
 	self.giveScoreFamilyOne = function() {
 		self.hub.sendGiveScoreFamilyOne();
@@ -329,9 +329,9 @@ $(function () {
 	parentViewModel.init();
 
 	ko.applyBindings(parentViewModel);
-	$.connection.hub.start(function () { 
-		parentViewModel.hub.startConnection();
-		self.notify = true;
-	});
+	// $.connection.hub.start(function () { 
+	// 	parentViewModel.hub.startConnection();
+	// 	self.notify = true;
+	// });
 
 });
