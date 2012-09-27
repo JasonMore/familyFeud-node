@@ -44,8 +44,7 @@
 </head>
 <body>
 
-
-<script src="javascripts/FamilyFeud.js"></script>
+<script src="javascripts/familyFeud.js"></script>
 
 <script type="text/javascript">
     //window.roundsData = @(Html.Raw(ViewBag.RoundsJsonData));
